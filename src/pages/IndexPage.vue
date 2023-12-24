@@ -14,7 +14,7 @@
       <PostList :post-list="postList" />
     </a-tab-pane>
     <a-tab-pane key="picture" tab="图片">
-      <PictureList />
+      <PictureList :picture-list="pictureList" />
     </a-tab-pane>
     <a-tab-pane key="user" tab="用户">
       <UserList :user-list="userList" />
@@ -32,17 +32,8 @@ import { useRoute, useRouter } from "vue-router";
 import myAxios from "@/plugins/myAxios";
 
 const postList = ref([]);
-
-myAxios.post("post/list/page/vo", {}).then((res: any) => {
-  postList.value = res.records;
-});
-
 const userList = ref([]);
-
-myAxios.post("user/list/page/vo", {}).then((res: any) => {
-  console.log(res);
-  userList.value = res.records;
-});
+const pictureList = ref([]);
 
 // const searchText = ref("");
 const router = useRouter();
@@ -57,6 +48,57 @@ const initSearchParams = {
 
 const searchParams = ref(initSearchParams);
 
+/**
+ * 加载数据
+ * @param params
+ */
+const loadDataOld = (params: any) => {
+  const postQuery = {
+    ...params,
+    searchText: params.text,
+  };
+  myAxios.post("post/list/page/vo", postQuery).then((res: any) => {
+    postList.value = res.records;
+  });
+
+  const pictureQuery = {
+    ...params,
+    searchText: params.text,
+  };
+
+  myAxios.post("picture/list/page/vo", pictureQuery).then((res: any) => {
+    pictureList.value = res.records;
+  });
+
+  const userQuery = {
+    ...params,
+    userName: params.text,
+  };
+  myAxios.post("user/list/page/vo", userQuery).then((res: any) => {
+    console.log(res);
+    userList.value = res.records;
+  });
+};
+
+/**
+ * 加载数据
+ * @param params
+ */
+const loadData = (params: any) => {
+  const query = {
+    ...params,
+    searchText: params.text,
+  };
+  myAxios.post("search/all", query).then((res: any) => {
+    postList.value = res.postList;
+    userList.value = res.userList;
+    pictureList.value = res.pictureList;
+  });
+};
+
+// 首次请求
+loadData(initSearchParams);
+
 watchEffect(() => {
   searchParams.value = {
     // 这里是用于兜底的，最起码让他有个初始值可以用
@@ -70,6 +112,7 @@ const onSearch = (value: string) => {
   router.push({
     query: searchParams.value,
   });
+  loadData(searchParams.value);
 };
 
 const onTabChange = (key: string) => {
@@ -77,5 +120,6 @@ const onTabChange = (key: string) => {
     path: `/${key}`,
     query: searchParams.value,
   });
+  loadData(searchParams.value);
 };
 </script>

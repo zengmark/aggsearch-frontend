@@ -1,15 +1,17 @@
 <template>
-  <a-list item-layout="horizontal" :data-source="props.pictureList">
+  <a-list
+    :grid="{ gutter: 16, xs: 1, sm: 2, md: 4, lg: 4, xl: 6, xxl: 3 }"
+    item-layout="horizontal"
+    :data-source="props.pictureList"
+  >
     <template #renderItem="{ item }">
       <a-list-item>
-        <a-list-item-meta :description="item.content">
-          <template #title>
-            <a href="https://www.antdv.com/">{{ item.title }}</a>
+        <a-card hoverable>
+          <template #cover>
+            <img alt="example" :src="item.url" />
           </template>
-          <template #avatar>
-            <a-avatar :src="messi" />
-          </template>
-        </a-list-item-meta>
+          <a-card-meta :title="item.title"></a-card-meta>
+        </a-card>
       </a-list-item>
     </template>
   </a-list>
@@ -28,9 +30,4 @@ const props = withDefaults(defineProps<Props>(), {
 });
 </script>
 
-<style scoped>
-.messi {
-  width: 300px;
-  height: 200px;
-}
-</style>
+<style scoped></style>
